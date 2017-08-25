@@ -9,7 +9,6 @@ public class Manager : MonoBehaviour {
     GameObject panel;
     GameObject Dummy;
 	void Start () {
-        //DontDestroyOnLoad(transform.gameObject);
         panel = Instantiate(Resources.Load("Panel") as GameObject);
         panel.transform.SetParent(GameObject.Find("Canvas").transform);
         Vector3 pos = new Vector3(0, 0, 0);
