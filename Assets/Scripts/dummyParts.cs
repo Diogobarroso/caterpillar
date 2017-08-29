@@ -14,13 +14,11 @@ public class dummyParts : MonoBehaviour {
     void OnTriggerEnter2D(Collider2D other)
     {
         Objects++;
-        //transform.parent.gameObject.GetComponent<DummyScript>().setAnimation(true);
     }
     
     void OnTriggerExit2D(Collider2D other)
     {
         Objects--;
-        //transform.parent.gameObject.GetComponent<DummyScript>().setAnimation(false);
     }
 
     void Update()
