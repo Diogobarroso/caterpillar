@@ -14,4 +14,14 @@ public class MenuManager : MonoBehaviour {
     {
         Application.Quit();
     }
+
+    public void ClickParent()
+    {
+        SceneManager.LoadScene(4);
+    }
+
+    public void ClickAnalyze()
+    {
+
+    }
 }
