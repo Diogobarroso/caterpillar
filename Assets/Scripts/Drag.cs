@@ -26,6 +26,6 @@ class Drag : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
         itemBeingDragged = null;
         if (transform.parent != startParent)
             transform.position = start;
-        GameObject.Find("GameManager").GetComponent<Manager>().checkOperation();
+        //GameObject.Find("GameManager").GetComponent<Manager>().checkOperation();
     }
 }

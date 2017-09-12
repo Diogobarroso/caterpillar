@@ -4,12 +4,7 @@ using UnityEngine.UI;
 
 public class dummyParts : MonoBehaviour {
 
-    public void Start()
-    {
-        GetComponentInChildren<Text>().text = Objects.ToString();
-    }
-
-    int Objects = 0;
+	int Objects = 0;
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -21,8 +16,8 @@ public class dummyParts : MonoBehaviour {
         Objects--;
     }
 
-    void Update()
-    {
-        GetComponentInChildren<Text>().text = Objects.ToString();
-    }
+	public int getObjects()
+	{
+		return Objects;
+	}
 }

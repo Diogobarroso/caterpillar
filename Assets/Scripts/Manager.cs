@@ -8,43 +8,72 @@ public class Manager : MonoBehaviour {
     // Use this for initialization
     GameObject panel;
     GameObject Dummy;
+	GameObject Whole;
+	GameObject Part1;
+	GameObject Part2;
+
+	//Shake detection variables
+	float accelerometerUpdateInterval = 1.0f / 60.0f;
+	// The greater the value of LowPassKernelWidthInSeconds, the slower the
+	// filtered value will converge towards current input sample (and vice versa).
+	float lowPassKernelWidthInSeconds = 1.0f;
+	// This next parameter is initialized to 2.0 per Apple's recommendation,
+	// or at least according to Brady! ;)
+	float shakeDetectionThreshold = 2.0f;
+
+	float lowPassFilterFactor;
+	Vector3 lowPassValue;
+
 	void Start () {
+		lowPassFilterFactor = accelerometerUpdateInterval / lowPassKernelWidthInSeconds;
+		shakeDetectionThreshold *= shakeDetectionThreshold;
+		lowPassValue = Input.acceleration;
         panel = Instantiate(Resources.Load("Panel") as GameObject);
         panel.transform.SetParent(GameObject.Find("Canvas").transform);
         Vector3 pos = new Vector3(0, 0, 0);
         panel.transform.localPosition = pos;
         panel.SetActive(false);
         Dummy = GameObject.Find("Dummy");
+		Whole = GameObject.Find ("Whole");
+		Part1 = GameObject.Find ("Part1");
+		Part2 = GameObject.Find ("Part2");
     }
-	
+
     public void checkOperation()
     {
-        int whole = System.Int32.Parse(GameObject.Find("Whole").GetComponentInChildren<Text>().text);
-        int part1 = System.Int32.Parse(GameObject.Find("Part1").GetComponentInChildren<Text>().text);
-        int part2 = System.Int32.Parse(GameObject.Find("Part2").GetComponentInChildren<Text>().text);
-        int rest = System.Int32.Parse(GameObject.Find("Rest").GetComponentInChildren<Text>().text);
+		int whole = Whole.GetComponent<dummyParts> ().getObjects ();
+		int part1 = Part1.GetComponent<dummyParts> ().getObjects ();
+		int part2 = Part2.GetComponent<dummyParts> ().getObjects ();
         GameObject[] objs = GameObject.FindGameObjectsWithTag("Objects");
         int amountObjects = objs.Length;
         Debug.Log(part1 + " + " + part2 + " = " + whole);
 
-        if (part1 + part2 == whole && part1 + part2 + whole + rest == amountObjects)
+        if (part1 + part2 == whole)
         {
             StartCoroutine(Success(objs));
         }
+		else
+			Application.LoadLevel (Application.loadedLevelName);
+			
     }
-	// Update is called once per frame
-	void Update () {
-        	
+		
+	void Update()
+	{
+		Vector3 acceleration = Input.acceleration;
+		lowPassValue = Vector3.Lerp(lowPassValue, acceleration, lowPassFilterFactor);
+		Vector3 deltaAcceleration = acceleration - lowPassValue;
+
+		if (deltaAcceleration.sqrMagnitude >= shakeDetectionThreshold)
+		{
+			checkOperation ();
+		}
 	}
 
     IEnumerator Success(GameObject[] objs)
     {
-        GameObject.Find("Rest").SetActive(false);
         foreach (GameObject obj in objs)
             obj.SetActive(false);
 
-        for (int i = 0; i < 3; i++)
-            Dummy.transform.GetChild(i).GetComponentInChildren<Text>().enabled = false;
         GameObject.Find("Dummy").GetComponent<Animator>().enabled = true;
         GameObject.Find("Dummy").GetComponent<DummyScript>().setSpeed(300);
 
