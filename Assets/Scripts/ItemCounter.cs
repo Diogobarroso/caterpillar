@@ -29,6 +29,5 @@ public class ItemCounter : MonoBehaviour, IDropHandler {
     {
         Drag.itemBeingDragged.transform.SetParent(transform);
         GetComponent<Text>().text = transform.childCount.ToString();
-        manager.GetComponent<Manager>().checkOperation();
     }
 }

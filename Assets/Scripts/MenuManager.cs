@@ -9,22 +9,27 @@ public class MenuManager : MonoBehaviour {
 	public void ClickPlay()
     {
 		Destroy (GameObject.Find ("FirstMenu"));
-		GameObject levelSelection = Instantiate(Resources.Load ("Level Selection") as GameObject);
+		Destroy (GameObject.Find ("Title"));
+		/*GameObject levelSelection = Instantiate(Resources.Load ("Level Selection") as GameObject);
 		levelSelection.transform.SetParent(GameObject.Find("Canvas").transform);
 		Vector3 pos = new Vector3 (0, -60, 0);
 		levelSelection.transform.localPosition = pos;
+		Button[] buts = levelSelection.GetComponentsInChildren<Button> ();
 
-		for(int i = 0; i < levelSelection.transform.childCount; i++)
-		{
-			Button but = levelSelection.GetComponentsInChildren<Button>()[i];
-			Debug.Log (but.name);
-			but.onClick.AddListener (() => OpenLevel (but.name));
-		}
+		foreach(Button but in buts)
+			but.onClick.AddListener (() => StartCoroutine(OpenLevel (but.name)));
+			*/
+		StartCoroutine(OpenLevel("1.1"));
     }
 
-	void OpenLevel(string level)
+	IEnumerator OpenLevel(string level)
 	{
-		Debug.Log ("DUUUUUDE");
+		//Destroy(GameObject.Find ("Level Selection(Clone)"));
+		GameObject innerSplash = Instantiate(Resources.Load ("InnerSplashAddition") as GameObject);
+		innerSplash.transform.SetParent(GameObject.Find("Canvas").transform);
+		Vector3 pos = new Vector3(0, 0, 0);
+		innerSplash.transform.localPosition = pos;
+		yield return new WaitForSeconds(2);
 		SceneManager.LoadScene (level);
 	}
 
@@ -32,18 +37,5 @@ public class MenuManager : MonoBehaviour {
     {
         Application.Quit();
     }
-
-    public void ClickParent()
-    {
-        SceneManager.LoadScene(4);
-    }
-
-    public void ClickAnalyze()
-    {
-
-    }
-
-	void showLevels()
-	{
-	}
+		
 }

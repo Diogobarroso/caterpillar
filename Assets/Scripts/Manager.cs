@@ -11,9 +11,11 @@ public class Manager : MonoBehaviour {
 	GameObject Whole;
 	GameObject Part1;
 	GameObject Part2;
+	GameObject[] objects;
+	List<Vector3> positions;
 
 	//Shake detection variables
-	float accelerometerUpdateInterval = 1.0f / 60.0f;
+	float accelerometerUpdateInterval = 1.0f / 120.0f;
 	// The greater the value of LowPassKernelWidthInSeconds, the slower the
 	// filtered value will converge towards current input sample (and vice versa).
 	float lowPassKernelWidthInSeconds = 1.0f;
@@ -25,6 +27,7 @@ public class Manager : MonoBehaviour {
 	Vector3 lowPassValue;
 
 	void Start () {
+		positions = new List<Vector3> ();
 		lowPassFilterFactor = accelerometerUpdateInterval / lowPassKernelWidthInSeconds;
 		shakeDetectionThreshold *= shakeDetectionThreshold;
 		lowPassValue = Input.acceleration;
@@ -37,34 +40,37 @@ public class Manager : MonoBehaviour {
 		Whole = GameObject.Find ("Whole");
 		Part1 = GameObject.Find ("Part1");
 		Part2 = GameObject.Find ("Part2");
+
+		objects = GameObject.FindGameObjectsWithTag ("Objects");
+		foreach (GameObject obj in objects)
+			positions.Add (obj.transform.localPosition);
     }
 
-    public void checkOperation()
+	private void checkOperation()
     {
 		int whole = Whole.GetComponent<dummyParts> ().getObjects ();
 		int part1 = Part1.GetComponent<dummyParts> ().getObjects ();
 		int part2 = Part2.GetComponent<dummyParts> ().getObjects ();
-        GameObject[] objs = GameObject.FindGameObjectsWithTag("Objects");
-        int amountObjects = objs.Length;
-        Debug.Log(part1 + " + " + part2 + " = " + whole);
+		GameObject[] objs = GameObject.FindGameObjectsWithTag ("Objects");
+		Debug.Log (part1 + " + " + part2 + " = " + whole);
 
-        if (part1 + part2 == whole)
-        {
-            StartCoroutine(Success(objs));
-        }
-		else
-			Application.LoadLevel (Application.loadedLevelName);
-			
-    }
+		if (part1 + part2 == whole) {
+			Debug.Log ("CORRECT: " + part1 + " + " + part2 + " = " + whole);
+			StartCoroutine (Success (objs));
+		} else {
+			Debug.Log ("WRONG");
+			for (int i = 0; i < GameObject.FindGameObjectsWithTag ("Objects").Length; i++)
+				objects [i].transform.localPosition = positions [i];
+		}
+	}
 		
 	void Update()
 	{
 		Vector3 acceleration = Input.acceleration;
-		lowPassValue = Vector3.Lerp(lowPassValue, acceleration, lowPassFilterFactor);
+		lowPassValue = Vector3.Lerp (lowPassValue, acceleration, lowPassFilterFactor);
 		Vector3 deltaAcceleration = acceleration - lowPassValue;
 
-		if (deltaAcceleration.sqrMagnitude >= shakeDetectionThreshold)
-		{
+		if (deltaAcceleration.sqrMagnitude >= shakeDetectionThreshold) {
 			checkOperation ();
 		}
 	}
@@ -83,12 +89,41 @@ public class Manager : MonoBehaviour {
         {
             GameObject.Find("StarBG" + i).GetComponent<Image>().color = Color.white;
         }
-        panel.GetComponentInChildren<Button>().onClick.AddListener(() => nextLevel());
+		panel.GetComponentInChildren<Button>().onClick.AddListener(() => StartCoroutine(nextLevel()));
     }
 
-    public void nextLevel()
+	IEnumerator nextLevel()
     {
         int index = SceneManager.GetActiveScene().buildIndex;
+		if (index == 3) {
+			Destroy (GameObject.Find ("Panel(Clone)"));
+			GameObject grats = Instantiate (Resources.Load ("CongratulationsAddition") as GameObject);
+			grats.transform.SetParent (GameObject.Find ("Canvas").transform);
+			Vector3 pos = new Vector3 (0, 0, 0);
+			grats.transform.localPosition = pos;
+			yield return new WaitForSeconds (2);
+			Destroy (grats);
+			GameObject innerSplash = Instantiate (Resources.Load ("InnerSplashSubtraction") as GameObject);
+			innerSplash.transform.SetParent (GameObject.Find ("Canvas").transform);
+			Vector3 tmp = new Vector3 (0, 0, 0);
+			innerSplash.transform.localPosition = tmp;
+			yield return new WaitForSeconds (2);
+
+		} else if (index == 6)
+		{
+			Destroy (GameObject.Find ("Panel(Clone)"));
+			GameObject grats = Instantiate (Resources.Load ("CongratulationsSubtraction") as GameObject);
+			grats.transform.SetParent (GameObject.Find ("Canvas").transform);
+			Vector3 pos = new Vector3 (0, 0, 0);
+			grats.transform.localPosition = pos;
+			yield return new WaitForSeconds (2);
+			SceneManager.LoadScene (0);
+		}
         SceneManager.LoadScene(index+1);
     }
+
+	public void homeButton()
+	{
+		SceneManager.LoadScene ("caterpillar_menu");
+	}
 }

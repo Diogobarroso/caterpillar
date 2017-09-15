@@ -4,7 +4,13 @@ using UnityEngine.UI;
 
 public class dummyParts : MonoBehaviour {
 
-	int Objects = 0;
+	int Objects;
+
+	public void Start()
+	{
+		//Objects = 0;
+
+	}
 
     void OnTriggerEnter2D(Collider2D other)
     {
@@ -20,4 +26,5 @@ public class dummyParts : MonoBehaviour {
 	{
 		return Objects;
 	}
+		
 }
